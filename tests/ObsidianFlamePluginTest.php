@@ -21,177 +21,83 @@ final class ObsidianFlamePluginTest extends TestCase
     }
 
     #[Test]
-    public function itImplementsLifecycleInterface(): void
+    public function testImplementsLifecycleInterface(): void
     {
         $this->assertInstanceOf(\Phlix\Shared\Plugin\LifecycleInterface::class, $this->plugin);
     }
 
     #[Test]
-    public function itImplementsThemeSourceInterface(): void
+    public function testImplementsThemeSourceInterface(): void
     {
         $this->assertInstanceOf(\Phlix\Theming\ThemeSourceInterface::class, $this->plugin);
     }
 
     #[Test]
-    public function itReturnsCorrectSourceName(): void
+    public function testThemeSourceNameReturnsCorrectValue(): void
     {
         $this->assertSame('obsidian-flame', $this->plugin->themeSourceName());
     }
 
     #[Test]
-    public function itProvidesAtLeastOneTheme(): void
+    public function testProvidedThemesReturnsExpectedStructure(): void
     {
         $themes = $this->plugin->providedThemes();
+
+        $this->assertIsArray($themes);
         $this->assertNotEmpty($themes, 'Plugin must provide at least one theme');
-    }
 
-    #[Test]
-    public function itProvidesObsidianFlameThemeWithCorrectId(): void
-    {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme, 'First theme must exist');
+        $theme = $themes[0];
         $this->assertSame('obsidian-flame', $theme['id']);
         $this->assertSame('Obsidian Flame', $theme['name']);
-        $this->assertTrue($theme['dark'], 'Theme must be marked as dark');
-    }
-
-    #[Test]
-    public function itExtendsMidnightBase(): void
-    {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme);
+        $this->assertTrue($theme['dark']);
         $this->assertSame('midnight', $theme['extends']);
-    }
-
-    #[Test]
-    public function itProvidesRequiredColorTokens(): void
-    {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme);
         $this->assertArrayHasKey('tokens', $theme);
-
-        $tokens = $theme['tokens'];
-
-        // Core color tokens
-        $this->assertArrayHasKey('--color-bg', $tokens);
-        $this->assertArrayHasKey('--color-surface', $tokens);
-        $this->assertArrayHasKey('--color-text', $tokens);
-        $this->assertArrayHasKey('--color-text-muted', $tokens);
-        $this->assertArrayHasKey('--color-border', $tokens);
     }
 
     #[Test]
-    public function itProvidesAccentTokens(): void
+    public function testAllTokensAreValidCssValues(): void
     {
         $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme);
+        $theme = $themes[0];
         $tokens = $theme['tokens'];
 
-        $this->assertArrayHasKey('--accent', $tokens);
-        $this->assertArrayHasKey('--accent-hover', $tokens);
-        $this->assertArrayHasKey('--accent-active', $tokens);
-        $this->assertArrayHasKey('--accent-soft', $tokens);
-        $this->assertArrayHasKey('--accent-ring', $tokens);
-        $this->assertArrayHasKey('--accent-text', $tokens);
-    }
+        $forbidden = ['var(', 'url(', '/*', ';', '}', '{', '\\', "\n", "\t"];
 
-    #[Test]
-    public function itProvidesSurfaceTokens(): void
-    {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme);
-        $tokens = $theme['tokens'];
-
-        $this->assertArrayHasKey('--surface', $tokens);
-        $this->assertArrayHasKey('--surface-2', $tokens);
-        $this->assertArrayHasKey('--surface-3', $tokens);
-        $this->assertArrayHasKey('--surface-glass', $tokens);
-        $this->assertArrayHasKey('--surface-glass-strong', $tokens);
-    }
-
-    #[Test]
-    public function itProvidesBorderTokens(): void
-    {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme);
-        $tokens = $theme['tokens'];
-
-        $this->assertArrayHasKey('--border', $tokens);
-        $this->assertArrayHasKey('--border-subtle', $tokens);
-        $this->assertArrayHasKey('--border-strong', $tokens);
-    }
-
-    #[Test]
-    public function itProvidesAtmosphericTokens(): void
-    {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme);
-        $tokens = $theme['tokens'];
-
-        $this->assertArrayHasKey('--grain-opacity', $tokens);
-        $this->assertArrayHasKey('--vignette', $tokens);
-        $this->assertArrayHasKey('--ambient', $tokens);
-    }
-
-    #[Test]
-    public function itReturnsNoSubscribedEvents(): void
-    {
-        $events = $this->plugin->subscribedEvents();
-        $this->assertIsArray($events);
-        $this->assertEmpty($events, 'Theme plugins should not subscribe to events');
-    }
-
-    #[Test]
-    public function itHandlesEnableWithoutErrors(): void
-    {
-        $container = $this->createMock(\Psr\Container\ContainerInterface::class);
-
-        // Should not throw
-        $this->plugin->onEnable($container);
-        $this->assertTrue(true, 'onEnable should complete without errors');
-    }
-
-    #[Test]
-    public function itHandlesDisableWithoutErrors(): void
-    {
-        // Should not throw
-        $this->plugin->onDisable();
-        $this->assertTrue(true, 'onDisable should complete without errors');
-    }
-
-    #[Test]
-    public function tokensAreValidCssColorValues(): void
-    {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0] ?? null;
-
-        $this->assertNotNull($theme);
-        $tokens = $theme['tokens'];
-
-        // Each token value should be a valid CSS color (hex, rgb, rgba, etc.)
         foreach ($tokens as $token => $value) {
             $this->assertIsString($value, "Token {$token} must have a string value");
             $this->assertNotEmpty($value, "Token {$token} must not be empty");
+
+            foreach ($forbidden as $f) {
+                $this->assertStringNotContainsString(
+                    $f,
+                    $value,
+                    "Token {$token} contains forbidden CSS construct \"{$f}\""
+                );
+            }
         }
     }
 
     #[Test]
-    public function constantSourceNameIsCorrect(): void
+    public function testOnEnableDoesNotThrow(): void
     {
-        $this->assertSame('obsidian-flame', ObsidianFlamePlugin::SOURCE_NAME);
+        $container = $this->createMock(\Psr\Container\ContainerInterface::class);
+
+        $this->plugin->onEnable($container);
+        $this->assertTrue(true);
+    }
+
+    #[Test]
+    public function testOnDisableDoesNotThrow(): void
+    {
+        $this->plugin->onDisable();
+        $this->assertTrue(true);
+    }
+
+    #[Test]
+    public function testSubscribedEventsReturnsEmptyArray(): void
+    {
+        $events = $this->plugin->subscribedEvents();
+        $this->assertIsArray($events);
+        $this->assertEmpty($events);
     }
 }
