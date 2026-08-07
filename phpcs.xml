@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Phlix Obsidian Flame">
+    <description>PHP CodeSniffer rules for Phlix Obsidian Flame plugin</description>
+
+    <arg name="tab-width" value="4"/>
+    <arg name="indent" value="4"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="warningSeverity" value="0"/>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <!-- PSR-12 -->
+    <rule ref="PSR12"/>
+
+    <!-- Array rules -->
+    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
+    <rule ref="Squiz.Arrays.ArrayDeclaration"/>
+
+    <!-- Operators -->
+    <rule ref="Squiz.Operators.ComparisonOperator"/>
+
+    <!-- Strings -->
+    <rule ref="Squiz.Strings.DoubleQuotesUsage"/>
+    <rule ref="Squiz.Strings.SingleQuoteUsage"/>
+
+    <!-- Whitespace -->
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
+    <rule ref="Squiz.WhiteSpace.ObjectOperatorSpacing"/>
+    <rule ref="Squiz.WhiteSpace.CastSpacing"/>
+    <rule ref="Squiz.WhiteSpace.LogicalOperatorSpacing"/>
+
+    <!-- Control structures -->
+    <rule ref="Squiz.ControlStructures.ControlSignature"/>
+    <rule ref="Squiz.ControlStructures.ForEachLoopDeclaration"/>
+
+    <!-- PHP -->
+    <rule ref="Squiz.PHP.DisallowSizeFunctionsInLoops"/>
+    <rule ref="Squiz.PHP.Eval"/>
+    <rule ref="Squiz.PHP.GlobalKeyword"/>
+    <rule ref="Squiz.PHP.LowercasePHPFunctions"/>
+</ruleset>

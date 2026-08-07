@@ -1,0 +1,15 @@
+parameters:
+    level: 9
+    scanDirectories:
+        - dev-stubs
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - vendor
+        - dev-stubs
+    ignoreErrors:
+        # Allow dynamic return types from container
+        - '#Dynamic call to static method#'
+    reportUnmatchedIgnoredErrors: false
+    editorUrl: 'phpstorm://open?file=%file%&line=%line%'
