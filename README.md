@@ -49,7 +49,7 @@ composer require detain/phlix-plugin-obsidian-flame-theme
 
 ## Requirements
 
-- PHP 8.3+
+- PHP 8.3+ (CI runs `8.3` and `8.4`)
 - Phlix 0.44.0+
 
 ## Theme Tokens
@@ -69,6 +69,22 @@ The theme provides CSS custom properties (tokens) that can be referenced in your
   color: var(--text-on-accent);
 }
 ```
+
+## Development
+
+```bash
+composer install
+```
+
+The same three checks `.github/workflows/test.yml` runs:
+
+```bash
+vendor/bin/phpunit
+vendor/bin/phpstan analyse -c phpstan.neon
+vendor/bin/phpcs --standard=phpcs.xml
+```
+
+Pass the config files rather than bare paths: `phpstan.neon` scans `dev-stubs/` for the host-only `Phlix\Theming\ThemeSourceInterface`, and `phpcs.xml` covers `src`, `tests`, and `dev-stubs`. `composer phpstan` and `composer phpcs` are shortcuts for the last two.
 
 ## License
 
