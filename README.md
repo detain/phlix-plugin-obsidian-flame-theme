@@ -13,7 +13,7 @@ Obsidian Flame extends the built-in `midnight` theme, layering a rich obsidian p
 - **Accent Hover**: `#ff8c5a`
 - **Accent Active**: `#e05520`
 - **Accent Soft**: `rgba(255, 107, 53, 0.12)`
-- **Accent Ring**: `rgba(255, 107, 53, 0.45)`
+- **Accent Ring**: `rgba(255, 107, 53, 0.65)` — focus ring ≥3:1 on every ground
 - **Accent Text**: `#ffe4d6`
 
 ### Background & Surface

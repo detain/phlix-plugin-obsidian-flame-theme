@@ -85,7 +85,10 @@ final class ObsidianFlamePlugin implements LifecycleInterface, ThemeSourceInterf
                     '--accent-hover' => '#ff8c5a',
                     '--accent-active' => '#e05520',
                     '--accent-soft' => 'rgba(255, 107, 53, 0.12)',
-                    '--accent-ring' => 'rgba(255, 107, 53, 0.45)',
+                    // 0.65 clears WCAG 1.4.11's 3:1 non-text minimum against
+                    // every painted ground (tightest: 3.11 on --surface-3);
+                    // the old 0.45 sat at 2.19 — focus was barely perceivable.
+                    '--accent-ring' => 'rgba(255, 107, 53, 0.65)',
                     '--accent-text' => '#ffe4d6',
 
                     // Background + elevation stack.
