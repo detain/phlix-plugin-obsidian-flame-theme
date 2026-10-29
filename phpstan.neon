@@ -2,12 +2,24 @@ parameters:
     level: 9
     scanDirectories:
         - dev-stubs
+    # The family reference corpus (phlix-plugin-sample-theme/phpstan.neon) is
+    # src + tests, never just src. 5f5a803 narrowed this file to [src], which
+    # left 1,152 lines of tests — including the 1,015-line SecurityAuditCheckTest
+    # that guards the S440 gate — unanalysed at level 9. scripts/ joins the
+    # corpus too: security-audit-check.php is the code that DECIDES the audit
+    # verdict and must not be the least-checked PHP in the repo. It analyses
+    # clean today; the paths entry is the tripwire that keeps it that way.
     paths:
         - src
+        - tests
+        - scripts
     excludePaths:
         - vendor
-    ignoreErrors:
-        # Allow dynamic return types from container
-        - '#Dynamic call to static method#'
-    reportUnmatchedIgnoredErrors: false
+    # No ignoreErrors here, deliberately, and therefore no
+    # reportUnmatchedIgnoredErrors either: the lone
+    # '#Dynamic call to static method#' rule matched nothing under any corpus
+    # (measured: level 9 over src+tests+scripts reports zero of them), and
+    # reportUnmatchedIgnoredErrors: false is precisely the setting that made a
+    # dead suppression permanent and undetectable. Re-add rules only against a
+    # measured, attributed error.
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

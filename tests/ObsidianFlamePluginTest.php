@@ -38,12 +38,37 @@ final class ObsidianFlamePluginTest extends TestCase
         $this->assertSame('obsidian-flame', $this->plugin->themeSourceName());
     }
 
+    /**
+     * The token map of the shipped payload, narrowed at RUNTIME rather than
+     * by a docblock cast — the shape claim is what this suite checks, so
+     * asserting it is the point, not overhead. The narrowing also keeps the
+     * file honest under phpstan level 9 (tests are in the analysed corpus).
+     *
+     * @return array<string, string>
+     */
+    private function tokensOfFirstPayload(): array
+    {
+        $themes = $this->plugin->providedThemes();
+        $this->assertNotEmpty($themes, 'Plugin must provide at least one theme.');
+
+        $tokens = $themes[0]['tokens'] ?? null;
+        $this->assertIsArray($tokens, 'The payload must carry a tokens map.');
+
+        $narrowed = [];
+        foreach ($tokens as $key => $value) {
+            $this->assertIsString($key, 'A token name must be a string.');
+            $this->assertIsString($value, "Token {$key} must have a string value.");
+            $narrowed[$key] = $value;
+        }
+
+        return $narrowed;
+    }
+
     #[Test]
     public function testProvidedThemesReturnsExpectedStructure(): void
     {
         $themes = $this->plugin->providedThemes();
 
-        $this->assertIsArray($themes);
         $this->assertNotEmpty($themes, 'Plugin must provide at least one theme');
 
         $theme = $themes[0];
@@ -57,14 +82,9 @@ final class ObsidianFlamePluginTest extends TestCase
     #[Test]
     public function testAllTokensAreValidCssValues(): void
     {
-        $themes = $this->plugin->providedThemes();
-        $theme = $themes[0];
-        $tokens = $theme['tokens'];
-
         $forbidden = ['var(', 'url(', '/*', ';', '}', '{', '\\', "\n", "\t"];
 
-        foreach ($tokens as $token => $value) {
-            $this->assertIsString($value, "Token {$token} must have a string value");
+        foreach ($this->tokensOfFirstPayload() as $token => $value) {
             $this->assertNotEmpty($value, "Token {$token} must not be empty");
 
             foreach ($forbidden as $f) {
@@ -83,21 +103,20 @@ final class ObsidianFlamePluginTest extends TestCase
         $container = $this->createMock(\Psr\Container\ContainerInterface::class);
 
         $this->plugin->onEnable($container);
-        $this->assertTrue(true);
+        $this->expectNotToPerformAssertions();
     }
 
     #[Test]
     public function testOnDisableDoesNotThrow(): void
     {
         $this->plugin->onDisable();
-        $this->assertTrue(true);
+        $this->expectNotToPerformAssertions();
     }
 
     #[Test]
     public function testSubscribedEventsReturnsEmptyArray(): void
     {
         $events = $this->plugin->subscribedEvents();
-        $this->assertIsArray($events);
         $this->assertEmpty($events);
     }
 }
