@@ -43,9 +43,61 @@ Obsidian Flame extends the built-in `midnight` theme, layering a rich obsidian p
 
 ## Installation
 
+Do **not** install this with `composer require` into the Phlix server. The
+server's plugin loader scans `var/plugins/<plugin-name>/` — it never looks in
+its own `vendor/`, so a composer-require'd copy sits on disk invisible to the
+theme picker. (`composer require` is only meaningful for a library that embeds
+this package as its own dependency, which the server deliberately is not.)
+
+### The supported route: the plugin catalog
+
+The Phlix server installs plugins from a **catalog** (`plugins.json`). A catalog
+entry pins an exact commit (`ref`) and the sha256 of that commit's tarball
+(`artifactSha256`), and the server verifies those bytes before it extracts
+anything. Without a pin, `PluginLoader::install()` refuses outright — that is a
+deliberate default-deny, not a bug to work around.
+
+**Admin UI** — *Admin → Plugins* (`/app/admin/plugins`), find **Obsidian Flame
+Theme**, press **Install**, then flip its switch to enable it. (The page posts
+the catalog entry's `repo` URL to `POST /api/v1/admin/plugins/install`; the
+server matches that URL against the catalog and supplies the pin itself.)
+
+**CLI** — the same thing, from the server root:
+
 ```bash
-composer require detain/phlix-plugin-obsidian-flame-theme
+php bin/phlix plugin:install https://github.com/detain/phlix-plugin-obsidian-flame-theme
+php bin/phlix plugin:enable  phlix-plugin-obsidian-flame-theme
+php bin/phlix plugin:list
 ```
+
+Two details that are easy to get wrong:
+
+* **Install is not enable.** A fresh install lands *disabled* — enabling is
+  what registers the theme source, so until you flip the switch (or run
+  `plugin:enable`) the theme picker will not show **Obsidian Flame**. That is
+  by design, not a failed install.
+* **Pass the repository URL, not the plugin name.** `pinFor()` will match a
+  bare `phlix-plugin-obsidian-flame-theme` against the catalog and find the
+  pin, but the source string itself is then handed to the installer unchanged,
+  and `phlix-plugin-obsidian-flame-theme` is not something it can download. The
+  **`repo` URL** is rewritten to `…/archive/<pinned-ref>.tar.gz`; the name is
+  not.
+
+### A local build, for developing your own theme
+
+While you are iterating on a fork there is no catalog entry yet. Build a
+tarball and install it over `file://`, which is exempt from the pin requirement
+because the bytes are already yours:
+
+```bash
+tar --exclude=vendor --exclude=.git -czf /tmp/obsidian-flame.tar.gz phlix-plugin-obsidian-flame-theme/
+php bin/phlix plugin:install file:///tmp/obsidian-flame.tar.gz
+php bin/phlix plugin:enable  phlix-plugin-obsidian-flame-theme
+```
+
+A `.zip` works identically, and the archive may have a single top-level
+directory (the shape `git archive` and GitHub's codeload produce) — the
+installer lifts its contents up automatically.
 
 ## Requirements
 
