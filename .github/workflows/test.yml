@@ -27,15 +27,16 @@ jobs:
       - name: Run PHPUnit
         run: vendor/bin/phpunit --colors=always
 
-      # phpunit.xml writes a cobertura report to ./coverage.xml (pcov is enabled above).
-      # Uploaded from a single matrix leg so both PHP versions do not race on the same commit.
-      - name: Upload coverage to Codacy
-        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699
-        continue-on-error: true
-        if: matrix.php == '8.3'
-        with:
-          api-token: ${{ secrets.CODACY_API_TOKEN }}
-          coverage-reports: ./coverage.xml
+      # There is deliberately NO coverage-upload step here. The former
+      # "Upload coverage to Codacy" step (deleted 2026-10-29) was theater: it
+      # referenced secrets.CODACY_API_TOKEN — a secret this repository has
+      # never carried — and this phpunit.xml has never configured a cobertura
+      # report, so the step failed on every single CI run (verified in origin
+      # run 39371976009: "Invalid configuration: Either a project or account
+      # API token must be provided", exit code 1) while continue-on-error:
+      # true kept the badge green. Do not re-add a masked, always-failing
+      # telemetry step: either wire a real Codacy project and its secret and
+      # upload without continue-on-error, or ship no step and claim nothing.
 
       # -c phpstan.neon (not `analyse src`) so scanDirectories picks up the
       # dev-stub for the host-only Phlix\Theming\ThemeSourceInterface.
