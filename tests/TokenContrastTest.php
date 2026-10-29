@@ -14,17 +14,28 @@ use Phlix\ObsidianFlame\ObsidianFlamePlugin;
  * duplicated here, so changing a token in the payload immediately re-tests the
  * promise the README palette table makes about it.
  *
- * Laws pinned (theme-obsidian-flame__webux M1):
+ * Laws pinned (theme-obsidian-flame__webux M1/M2):
  *  1. --accent-ring composited over EVERY painted ground (--bg, --surface,
  *     --surface-2, --surface-3) clears the WCAG 1.4.11 non-text minimum 3:1.
  *     The shipped 0.45 alpha sat at 2.19:1 on --bg — a focus indicator the
  *     review could not perceive; the cure lifted it to 0.65.
+ *  2. --text-subtle clears the WCAG 1.4.3 body-text AA minimum 4.5:1 on every
+ *     ground (the old #6d6460 was 3.49:1 on --bg and 2.72:1 on --surface-3;
+ *     the cure #978d86 never drops below 4.84).
+ *  3. The text ramp is STRICTLY ORDERED on every ground:
+ *     --text > --text-muted > --text-subtle > --text-faint in prominence,
+ *     i.e. contrast descends monotonically along the list. An equal or
+ *     inverted step means two levels are visually the same ink — dead weight
+ *     in the ramp (and a failed claim of four distinct levels).
  */
 #[CoversClass(ObsidianFlamePlugin::class)]
 final class TokenContrastTest extends TestCase
 {
     /** WCAG 1.4.11 non-text contrast minimum. */
     private const NON_TEXT_MIN = 3.0;
+
+    /** WCAG 1.4.3 body-text AA contrast minimum. */
+    private const BODY_TEXT_MIN = 4.5;
 
     /** @var list<string> every ground a token can be painted onto */
     private const GROUNDS = ['--bg', '--surface', '--surface-2', '--surface-3'];
@@ -98,9 +109,9 @@ final class TokenContrastTest extends TestCase
         $hex = $parts[1];
 
         return [
-            (int) substr($hex, 0, 2) / 255,
-            (int) substr($hex, 2, 2) / 255,
-            (int) substr($hex, 4, 2) / 255,
+            hexdec(substr($hex, 0, 2)) / 255,
+            hexdec(substr($hex, 2, 2)) / 255,
+            hexdec(substr($hex, 4, 2)) / 255,
         ];
     }
 
@@ -159,6 +170,47 @@ final class TokenContrastTest extends TestCase
                 $ratio,
                 "--accent-ring over {$groundName} must clear the 3:1 non-text minimum"
             );
+        }
+    }
+
+    #[Test]
+    public function testTextSubtleClearsBodyTextAaMinimumOnEveryGround(): void
+    {
+        $tokens = $this->tokens();
+        $subtle = $this->rgbOf($tokens, '--text-subtle');
+
+        foreach (self::GROUNDS as $groundName) {
+            $ratio = $this->contrast($subtle, $this->rgbOf($tokens, $groundName));
+            $this->assertGreaterThanOrEqual(
+                self::BODY_TEXT_MIN,
+                $ratio,
+                "--text-subtle over {$groundName} must clear the 4.5:1 AA body-text minimum"
+            );
+        }
+    }
+
+    #[Test]
+    public function testTextRampIsStrictlyOrderedOnEveryGround(): void
+    {
+        $tokens = $this->tokens();
+        $ramp = ['--text', '--text-muted', '--text-subtle', '--text-faint'];
+
+        foreach (self::GROUNDS as $groundName) {
+            $ground = $this->rgbOf($tokens, $groundName);
+            $previous = null;
+
+            foreach ($ramp as $level) {
+                $levelContrast = $this->contrast($this->rgbOf($tokens, $level), $ground);
+                if ($previous !== null) {
+                    $this->assertLessThan(
+                        $previous,
+                        $levelContrast,
+                        "{$level} must be strictly less prominent than the previous ramp level over {$groundName}"
+                    );
+                }
+
+                $previous = $levelContrast;
+            }
         }
     }
 }

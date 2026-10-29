@@ -27,7 +27,7 @@ Obsidian Flame extends the built-in `midnight` theme, layering a rich obsidian p
 ### Text
 - **Text Primary**: `#f0ebe4` — warm off-white
 - **Text Muted**: `#a69e96`
-- **Text Subtle**: `#6d6460`
+- **Text Subtle**: `#978d86` — ≥4.5:1 AA on every ground
 - **Text Faint**: `#3d3735`
 - **Text On Accent**: `#08070a`
 

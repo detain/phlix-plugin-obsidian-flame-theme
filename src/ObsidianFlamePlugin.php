@@ -102,7 +102,11 @@ final class ObsidianFlamePlugin implements LifecycleInterface, ThemeSourceInterf
                     // Text ramp.
                     '--text' => '#f0ebe4',
                     '--text-muted' => '#a69e96',
-                    '--text-subtle' => '#6d6460',
+                    // #978d86 clears WCAG 1.4.3's 4.5:1 AA body-text minimum on
+                    // every ground (tightest: 4.84 on --surface-3) while staying
+                    // strictly below --text-muted on all grounds; the old
+                    // #6d6460 sat at 3.49 on --bg and 2.72 on --surface-3.
+                    '--text-subtle' => '#978d86',
                     '--text-faint' => '#3d3735',
                     '--text-on-accent' => '#08070a',
 
