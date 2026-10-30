@@ -5,7 +5,9 @@
     <file>tests</file>
     <file>dev-stubs</file>
     <file>scripts</file>
-    <exclude-pattern>vendor/</exclude-pattern>
+    <!-- No vendor/ exclude-pattern: vendor is not inside any <file> scope
+         above, so such a line could only ever exclude nothing. (W-min141-
+         obsidian item 06, style-group noise named in the srphp m6 finding.) -->
     <rule ref="PSR12"/>
     <!--
         scripts/security-audit-check.php is the S440 CI gate: a CLI entry

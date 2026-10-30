@@ -13,8 +13,9 @@ parameters:
         - src
         - tests
         - scripts
-    excludePaths:
-        - vendor
+    # No excludePaths for vendor: vendor is not inside any path above, so an
+    # exclusion could only ever exclude nothing — the redundant line was dead
+    # style-group noise (W-min141-obsidian item 06, srphp m6 parenthetical).
     # No ignoreErrors here, deliberately, and therefore no
     # reportUnmatchedIgnoredErrors either: the lone
     # '#Dynamic call to static method#' rule matched nothing under any corpus
