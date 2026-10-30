@@ -14,7 +14,10 @@ Obsidian Flame extends the built-in `midnight` theme, layering a rich obsidian p
 - **Accent Active**: `#e05520`
 - **Accent Soft**: `rgba(255, 107, 53, 0.12)`
 - **Accent Ring**: `rgba(255, 107, 53, 0.65)` — focus ring ≥3:1 on every ground
-- **Accent Text**: `#ffe4d6`
+- **Accent Text**: `#ffe4d6` — the accent hue used *as foreground* (text and
+  icons on the dark grounds; AA ≥4.5:1 there, measured 16.57:1 on `--bg`). Not
+  the ink on accent fills — that is `--text-on-accent` (the inverse roles,
+  family-cohort confusion guard).
 
 ### Background & Surface
 - **Background**: `#08070a` — deep obsidian black
@@ -141,7 +144,7 @@ at a real `var()` consumer. (Status tokens are inherited whole from
 composer install
 ```
 
-The same three checks `.github/workflows/test.yml` runs:
+The three code-quality checks `.github/workflows/test.yml` runs:
 
 ```bash
 vendor/bin/phpunit
@@ -149,7 +152,11 @@ vendor/bin/phpstan analyse -c phpstan.neon
 vendor/bin/phpcs --standard=phpcs.xml
 ```
 
-Pass the config files rather than bare paths: `phpstan.neon` scans `dev-stubs/` for the host-only `Phlix\Theming\ThemeSourceInterface`, and `phpcs.xml` covers `src`, `tests`, and `dev-stubs`. `composer phpstan` and `composer phpcs` are shortcuts for the last two.
+Pass the config files rather than bare paths: `phpstan.neon` scans `dev-stubs/` for the host-only `Phlix\Theming\ThemeSourceInterface`, and `phpcs.xml` covers `src`, `tests`, `dev-stubs`, and `scripts`. `composer phpstan` and `composer phpcs` are shortcuts for the last two.
+
+Both static gates cover `scripts/security-audit-check.php` as well as the PHP source: the S440 gate script is analyzed at level 9 with zero ignores and checked under PSR-12 (two sniffs are scoped off for `scripts/` only — the reasons are pinned in `phpcs.xml`; the script itself is a byte-frozen family template).
+
+The workflow runs a fourth job beyond the three above: the S440 `composer-audit` leg (`php scripts/security-audit-check.php`, locked down by `tests/SecurityAuditCheckTest.php`) — the whole-lock audit that has no local shortcut, by gate design.
 
 ## License
 

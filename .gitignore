@@ -16,7 +16,15 @@ Thumbs.db
 
 # Build artifacts
 *.phar
-composer.lock
+# NOTE: composer.lock is deliberately NOT ignored here — this repo commits
+# it by S440 law (tracked since 8e60cfc; the audit gate is built on the
+# pinned lock: tests/SecurityAuditCheckTest.php's testTheCommittedLockExists
+# asserts the file and parses it for the whole-lock audit). The pre-S440
+# scaffold carried an ignore line for it — the known family contradiction:
+# it makes a regenerated lock invisible to staging and would let a PR
+# silently drop the lock where the `composer-audit` leg (--locked, no
+# install step by design) then fails confusingly. Kept out on purpose, not
+# an oversight.
 
 # Testing
 .phpunit.result.cache

@@ -4,6 +4,32 @@
     <file>src</file>
     <file>tests</file>
     <file>dev-stubs</file>
+    <file>scripts</file>
     <exclude-pattern>vendor/</exclude-pattern>
     <rule ref="PSR12"/>
+    <!--
+        scripts/security-audit-check.php is the S440 CI gate: a CLI entry
+        script that declares helper symbols AND runs top-level logic (its
+        first side effect is line 668) — the executable layout IS its
+        contract (the guard suite scans the body byte-region). PSR-1's
+        side-effects rule is structurally unsatisfiable there, so it is
+        scoped off for scripts/ only; every other PSR-12 law still applies.
+        The file itself is bright-line frozen (family template), so the
+        exception is the only cure. (W-min140 item 05, measured here at
+        tip 1340430: 0 errors, 2 warnings — this rule + LineLength below.)
+    -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>scripts/</exclude-pattern>
+    </rule>
+    <!--
+        Same scoping law for the line-length sniff: the gate script's
+        advisory annotation strings are fixed prose the guard suite
+        prefix-pins (:734 measures 121 chars against the 120 warning
+        limit), so the literal must stay byte-identical to the S440
+        family rather than be split. LineLength is scoped off for scripts/
+        only; src/, tests/ and dev-stubs/ keep the full law.
+    -->
+    <rule ref="Generic.Files.LineLength">
+        <exclude-pattern>scripts/</exclude-pattern>
+    </rule>
 </ruleset>
