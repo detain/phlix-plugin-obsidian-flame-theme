@@ -20,7 +20,7 @@ use Psr\Container\ContainerInterface;
  *
  * A dark theme with ember orange accents against deep obsidian backgrounds.
  * Extends the built-in `midnight` theme, layering the obsidian palette over
- * the base's status colours and semantic tokens.
+ * the base's status colors and semantic tokens.
  *
  * @package Phlix\ObsidianFlame
  * @since 1.0.0
@@ -120,7 +120,12 @@ final class ObsidianFlamePlugin implements LifecycleInterface, ThemeSourceInterf
                     '--vignette' => 'rgba(0, 0, 0, 0.7)',
                     '--ambient' => 'rgba(255, 107, 53, 0.18)',
 
-                    // Legacy `--color-*` aliases.
+                    // Legacy `--color-*` aliases — ONLY the ones the shipped
+                    // SPA still reads, set wherever the corresponding modern
+                    // token is overridden (flattening loses CSS's var()
+                    // following, so an override moves both halves explicitly).
+                    // The 13 zero-consumer aliases stay omitted on purpose —
+                    // see the README's alias note.
                     '--color-bg' => '#08070a',
                     '--color-surface' => '#110e12',
                     '--color-text' => '#f0ebe4',

@@ -4,7 +4,7 @@ A dark UI theme plugin for Phlix with ember orange accents against deep obsidian
 
 ## Overview
 
-Obsidian Flame extends the built-in `midnight` theme, layering a rich obsidian palette over the base's status colours and semantic tokens. The theme features a deep obsidian background with warm ember orange accents that create a distinctive, atmospheric visual experience.
+Obsidian Flame extends the built-in `midnight` theme, layering a rich obsidian palette over the base's status colors and semantic tokens. The theme features a deep obsidian background with warm ember orange accents that create a distinctive, atmospheric visual experience.
 
 ## Color Palette
 
@@ -121,6 +121,19 @@ The theme provides CSS custom properties (tokens) that can be referenced in your
   color: var(--text-on-accent);
 }
 ```
+
+The payload also carries the live half of the legacy `--color-*` alias family
+(`--color-bg`, `--color-surface`, `--color-text`, `--color-text-muted`,
+`--color-border`), each set explicitly to the same value as the modern token it
+mirrors: theme payloads are flattened by the host, which loses CSS's `var()`
+following, so a theme that overrides one half of a pair must set both. The 13
+zero-consumer aliases (`--color-primary{,-hover,-active}`,
+`--color-surface-{hover,elevated,active}`, `--color-text-secondary`,
+`--color-text-subtle`, `--color-border-subtle`, `--color-{error,success,
+warning,info}-bg`) are omitted on purpose — nothing in the shipped SPA reads
+them. If you fork this theme, keep the habit: only add an alias you can point
+at a real `var()` consumer. (Status tokens are inherited whole from
+`midnight`, pairs included, so their four live aliases need no copy here.)
 
 ## Development
 
