@@ -27,6 +27,15 @@ use Phlix\ObsidianFlame\ObsidianFlamePlugin;
  *     i.e. contrast descends monotonically along the list. An equal or
  *     inverted step means two levels are visually the same ink — dead weight
  *     in the ramp (and a failed claim of four distinct levels).
+ *  4. --text-faint clears the AA body-text minimum 4.5:1 on the grounds the ui
+ *     actually paints placeholder ink onto: --bg, --surface, and the auth
+ *     input ground (--surface composited over --bg at AuthField's 0.8 alpha).
+ *     Placeholder text is not a disabled control, so it is AA-bound; the old
+ *     #3d3735 sat at 1.72:1 on --bg (majors review obs #3) and the cure
+ *     #857b76 never drops below 4.65 on the three grounds. The topmost
+ *     elevations carry no faint text in the shipped flows and keep only the
+ *     ramp-order law — the same three-ground scoping jade's reviewed 0e3b3dc
+ *     and mystic's W-min136 faint cures shipped [R-THEME-OBSIDIAN-FLAME-01].
  */
 #[CoversClass(ObsidianFlamePlugin::class)]
 final class TokenContrastTest extends TestCase
@@ -39,6 +48,17 @@ final class TokenContrastTest extends TestCase
 
     /** @var list<string> every ground a token can be painted onto */
     private const GROUNDS = ['--bg', '--surface', '--surface-2', '--surface-3'];
+
+    /**
+     * Alpha the SPA paints `--surface` at for an auth input field.
+     *
+     * The shared ui's AuthField gives its input a translucent card ground
+     * (src/components/auth/AuthField.vue: `.authfield__input { background:
+     * color-mix(in srgb, var(--surface) 80%, transparent); }`), so the field's
+     * real ground is `--surface` composited onto `--bg` at this alpha. The
+     * value is family-canonical — jade and mystic pin the same constant.
+     */
+    private const INPUT_SURFACE_ALPHA = 0.8;
 
     private ObsidianFlamePlugin $plugin;
 
@@ -211,6 +231,50 @@ final class TokenContrastTest extends TestCase
 
                 $previous = $levelContrast;
             }
+        }
+    }
+
+    /**
+     * The auth input ground as a solid triplet: `--surface` composited over
+     * `--bg` at INPUT_SURFACE_ALPHA, the way browsers paint AuthField's
+     * translucent input.
+     *
+     * @param array<string, string> $tokens
+     * @return array{0: float, 1: float, 2: float}
+     */
+    private function inputGround(array $tokens): array
+    {
+        $surface = $this->rgbOf($tokens, '--surface');
+        $translucentSurface = [$surface[0], $surface[1], $surface[2], self::INPUT_SURFACE_ALPHA];
+
+        return $this->composite($translucentSurface, $this->rgbOf($tokens, '--bg'));
+    }
+
+    #[Test]
+    public function testTextFaintMeetsAaAsPlaceholderInkOnTheAuthGrounds(): void
+    {
+        $tokens = $this->tokens();
+        $faint = $this->rgbOf($tokens, '--text-faint');
+
+        $grounds = [
+            // The grounds placeholder ink actually paints on — the auth page
+            // bg, the card surface, and the translucent login input, which
+            // held the old faint at 1.72/1.64/1.66. The ui binds --text-faint
+            // as the AuthField ::placeholder color (plus the OAuth-divider
+            // ink), and placeholder text is not a disabled control — it is
+            // AA-bound.
+            '--bg' => $this->rgbOf($tokens, '--bg'),
+            '--surface' => $this->rgbOf($tokens, '--surface'),
+            'input composite' => $this->inputGround($tokens),
+        ];
+
+        foreach ($grounds as $name => $ground) {
+            $ratio = $this->contrast($faint, $ground);
+            $this->assertGreaterThanOrEqual(
+                self::BODY_TEXT_MIN,
+                $ratio,
+                sprintf('--text-faint on %s is %.2f:1 — below the 4.5:1 AA placeholder floor', $name, $ratio)
+            );
         }
     }
 }

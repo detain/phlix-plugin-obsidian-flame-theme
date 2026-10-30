@@ -107,7 +107,16 @@ final class ObsidianFlamePlugin implements LifecycleInterface, ThemeSourceInterf
                     // strictly below --text-muted on all grounds; the old
                     // #6d6460 sat at 3.49 on --bg and 2.72 on --surface-3.
                     '--text-subtle' => '#978d86',
-                    '--text-faint' => '#3d3735',
+                    // The ui binds this tier as AuthField ::placeholder ink, and
+                    // placeholder text is NOT a disabled control — it is AA-bound
+                    // (>= 4.5:1) on the grounds it actually paints: the auth page
+                    // bg (4.87), the card surface (4.65) and the translucent
+                    // login input composite (4.70). The old #3d3735 sat at 1.72
+                    // on --bg (majors review obs #3). Topmost elevations carry no
+                    // faint text in the shipped flows, so the ramp keeps its
+                    // ordering there; the same three-ground scoping jade cured in
+                    // 0e3b3dc and mystic in W-min136 [R-THEME-OBSIDIAN-FLAME-01].
+                    '--text-faint' => '#857b76',
                     '--text-on-accent' => '#08070a',
 
                     // Borders.
