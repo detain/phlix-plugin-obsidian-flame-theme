@@ -3,12 +3,14 @@ parameters:
     scanDirectories:
         - dev-stubs
     # The family reference corpus (phlix-plugin-sample-theme/phpstan.neon) is
-    # src + tests, never just src. 5f5a803 narrowed this file to [src], which
-    # left 1,152 lines of tests — including the 1,015-line SecurityAuditCheckTest
-    # that guards the S440 gate — unanalysed at level 9. scripts/ joins the
-    # corpus too: security-audit-check.php is the code that DECIDES the audit
-    # verdict and must not be the least-checked PHP in the repo. It analyses
-    # clean today; the paths entry is the tripwire that keeps it that way.
+    # src + tests, never just src. 5f5a803 narrowed this file to [src]; the
+    # tests — including the 1,015-line SecurityAuditCheckTest that guards the
+    # S440 gate, landed mid-window at 391dc1c — stayed unanalysed at level 9
+    # until 9b7399e restored the corpus, 1,173 test lines measured at that
+    # restore. scripts/ joins the corpus too: security-audit-check.php is the
+    # code that DECIDES the audit verdict and must not be the least-checked
+    # PHP in the repo. It analyses clean today; the paths entry is the
+    # tripwire that keeps it that way.
     paths:
         - src
         - tests
