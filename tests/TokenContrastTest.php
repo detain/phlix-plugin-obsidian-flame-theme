@@ -17,10 +17,10 @@ use Phlix\ObsidianFlame\ObsidianFlamePlugin;
  * Laws pinned (theme-obsidian-flame__webux M1/M2):
  *  1. --accent-ring composited over EVERY painted ground (--bg, --surface,
  *     --surface-2, --surface-3) clears the WCAG 1.4.11 non-text minimum 3:1.
- *     The shipped 0.45 alpha sat at 2.19:1 on --bg — a focus indicator the
+ *     The shipped 0.45 alpha sat at 2.20:1 on --bg — a focus indicator the
  *     review could not perceive; the cure lifted it to 0.65.
  *  2. --text-subtle clears the WCAG 1.4.3 body-text AA minimum 4.5:1 on every
- *     ground (the old #6d6460 was 3.49:1 on --bg and 2.72:1 on --surface-3;
+ *     ground (the old #6d6460 was 3.48:1 on --bg and 2.72:1 on --surface-3;
  *     the cure #978d86 never drops below 4.84).
  *  3. The text ramp is STRICTLY ORDERED on every ground:
  *     --text > --text-muted > --text-subtle > --text-faint in prominence,
