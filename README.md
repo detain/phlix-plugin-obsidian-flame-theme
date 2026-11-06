@@ -156,7 +156,7 @@ Pass the config files rather than bare paths: `phpstan.neon` scans `dev-stubs/` 
 
 Both static gates cover `scripts/security-audit-check.php` as well as the PHP source: the S440 gate script is analyzed at level 9 with zero ignores and checked under PSR-12 (two sniffs are scoped off for `scripts/` only — the reasons are pinned in `phpcs.xml`; the script itself is a byte-frozen family template).
 
-The workflow runs a fourth job beyond the three above: the S440 `composer-audit` leg (`php scripts/security-audit-check.php`, locked down by `tests/SecurityAuditCheckTest.php`) — the whole-lock audit that has no local shortcut, by gate design.
+The workflow runs a fourth check, as its own job, beyond the three above: the S440 `composer-audit` leg (`php scripts/security-audit-check.php`, locked down by `tests/SecurityAuditCheckTest.php`) — the whole-lock audit that has no local shortcut, by gate design.
 
 ## License
 
