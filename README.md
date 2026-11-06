@@ -160,4 +160,4 @@ The workflow runs a fourth check, as its own job, beyond the three above: the S4
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test bootstrap for the plugin PHPUnit suite.
+ * PHPUnit bootstrap.
  *
  * @copyright 2026 Joe Huss <detain@interserver.net>
  * @license   MIT
