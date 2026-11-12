@@ -107,16 +107,18 @@ final class ObsidianFlamePlugin implements LifecycleInterface, ThemeSourceInterf
                     // strictly below --text-muted on all grounds; the old
                     // #6d6460 sat at 3.48 on --bg and 2.72 on --surface-3.
                     '--text-subtle' => '#978d86',
-                    // The ui binds this tier as AuthField ::placeholder ink, and
-                    // placeholder text is NOT a disabled control — it is AA-bound
-                    // (>= 4.5:1) on the grounds it actually paints: the auth page
-                    // bg (4.87), the card surface (4.65) and the translucent
-                    // login input composite (4.70). The old #3d3735 sat at 1.72
-                    // on --bg (majors review obs #3). Topmost elevations carry no
-                    // faint text in the shipped flows, so the ramp keeps its
-                    // ordering there; the same three-ground scoping jade cured in
-                    // 0e3b3dc and mystic in W-min136 [R-THEME-OBSIDIAN-FLAME-01].
-                    '--text-faint' => '#857b76',
+                    // Faint ink is AA-bound (>= 4.5:1) on every ground the ui
+                    // paints it onto: it is CommandPalette's and SyncPlayModal's
+                    // ::placeholder ink on their --surface-2 overlay panels
+                    // (4.65 there; the modal's translucent input composite
+                    // 4.98) and the LoginForm/SignupForm divider + hint ink on
+                    // --bg (5.29) and --surface (5.05). AuthField binds
+                    // --text-subtle, not this tier. The old #857b76 sat at 4.28
+                    // on --surface-2. --surface-3 carries no faint text in the
+                    // shipped flows, so the ramp keeps its strict ordering
+                    // there (4.14 under --text-subtle's 4.84)
+                    // [R-THEME-OBSIDIAN-FLAME-01].
+                    '--text-faint' => '#8b817c',
                     '--text-on-accent' => '#08070a',
 
                     // Borders.
@@ -133,11 +135,12 @@ final class ObsidianFlamePlugin implements LifecycleInterface, ThemeSourceInterf
                     // SPA still reads, set wherever the corresponding modern
                     // token is overridden (flattening loses CSS's var()
                     // following, so an override moves both halves explicitly).
-                    // The 13 zero-consumer aliases stay omitted on purpose —
+                    // The 12 zero-consumer aliases stay omitted on purpose —
                     // see the README's alias note.
                     '--color-bg' => '#08070a',
                     '--color-surface' => '#110e12',
                     '--color-text' => '#f0ebe4',
+                    '--color-text-secondary' => '#a69e96',
                     '--color-text-muted' => '#a69e96',
                     '--color-border' => '#2a2328',
                 ],

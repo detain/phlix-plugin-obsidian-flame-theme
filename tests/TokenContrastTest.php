@@ -27,15 +27,20 @@ use Phlix\ObsidianFlame\ObsidianFlamePlugin;
  *     i.e. contrast descends monotonically along the list. An equal or
  *     inverted step means two levels are visually the same ink — dead weight
  *     in the ramp (and a failed claim of four distinct levels).
- *  4. --text-faint clears the AA body-text minimum 4.5:1 on the grounds the ui
- *     actually paints placeholder ink onto: --bg, --surface, and the auth
- *     input ground (--surface composited over --bg at AuthField's 0.8 alpha).
- *     Placeholder text is not a disabled control, so it is AA-bound; the old
- *     #3d3735 sat at 1.72:1 on --bg (majors review obs #3) and the cure
- *     #857b76 never drops below 4.65 on the three grounds. The topmost
- *     elevations carry no faint text in the shipped flows and keep only the
- *     ramp-order law — the same three-ground scoping jade's reviewed 0e3b3dc
- *     and mystic's W-min136 faint cures shipped [R-THEME-OBSIDIAN-FLAME-01].
+ *  4. --text-faint clears the AA body-text minimum 4.5:1 on every ground the
+ *     ui actually paints faint ink onto. Faint ink is AA-bound — placeholder
+ *     and hint text is not a disabled control. The live consumers are the
+ *     CommandPalette search ::placeholder (a transparent input on the palette
+ *     panel, --surface-2), the SyncPlayModal input ::placeholder (--surface
+ *     composited at 0.8 over the shared Modal panel, itself --surface-2), and
+ *     the LoginForm/SignupForm divider + hint ink on the auth page (--bg) and
+ *     auth card (--surface). AuthField is NOT a consumer: its ::placeholder
+ *     binds --text-subtle, so the former AuthField citation was stale. The
+ *     --surface-2 overlay panels are the binding ground: the old #857b76 sat
+ *     at 4.28:1 there (measured red) and the cure #8b817c clears 4.65, while
+ *     staying under --text-subtle (5.44 on --surface-2) so the ramp keeps
+ *     four distinct levels. --surface-3 carries no faint text in the shipped
+ *     flows and keeps only the ramp-order law (law 3) [R-THEME-OBSIDIAN-FLAME-01].
  */
 #[CoversClass(ObsidianFlamePlugin::class)]
 final class TokenContrastTest extends TestCase
@@ -50,13 +55,15 @@ final class TokenContrastTest extends TestCase
     private const GROUNDS = ['--bg', '--surface', '--surface-2', '--surface-3'];
 
     /**
-     * Alpha the SPA paints `--surface` at for an auth input field.
+     * Alpha the SPA paints `--surface` at for a modal text input.
      *
-     * The shared ui's AuthField gives its input a translucent card ground
-     * (src/components/auth/AuthField.vue: `.authfield__input { background:
-     * color-mix(in srgb, var(--surface) 80%, transparent); }`), so the field's
-     * real ground is `--surface` composited onto `--bg` at this alpha. The
-     * value is family-canonical — jade and mystic pin the same constant.
+     * The shared ui's SyncPlayModal gives its input a translucent ground
+     * (src/components/syncplay/SyncPlayModal.vue: `.syncplay-modal__input {
+     * background: color-mix(in srgb, var(--surface) 80%, transparent); }`)
+     * inside the shared Modal panel (src/components/ui/Modal.vue: `background:
+     * var(--surface-2)`), so the field's real ground is `--surface`
+     * composited onto `--surface-2` at this alpha. The value is
+     * family-canonical — jade and mystic pin the same constant.
      */
     private const INPUT_SURFACE_ALPHA = 0.8;
 
@@ -235,46 +242,65 @@ final class TokenContrastTest extends TestCase
     }
 
     /**
-     * The auth input ground as a solid triplet: `--surface` composited over
-     * `--bg` at INPUT_SURFACE_ALPHA, the way browsers paint AuthField's
-     * translucent input.
+     * The modal input ground as a solid triplet: `--surface` composited over
+     * `--surface-2` at INPUT_SURFACE_ALPHA, the way browsers paint
+     * SyncPlayModal's translucent input on the Modal panel.
      *
      * @param array<string, string> $tokens
      * @return array{0: float, 1: float, 2: float}
      */
-    private function inputGround(array $tokens): array
+    private function modalInputGround(array $tokens): array
     {
         $surface = $this->rgbOf($tokens, '--surface');
         $translucentSurface = [$surface[0], $surface[1], $surface[2], self::INPUT_SURFACE_ALPHA];
 
-        return $this->composite($translucentSurface, $this->rgbOf($tokens, '--bg'));
+        return $this->composite($translucentSurface, $this->rgbOf($tokens, '--surface-2'));
     }
 
-    #[Test]
-    public function testTextFaintMeetsAaAsPlaceholderInkOnTheAuthGrounds(): void
+    /**
+     * Assert --text-faint clears the AA body-text floor on each named ground.
+     *
+     * @param array<string, array{0: float, 1: float, 2: float}> $grounds
+     */
+    private function assertFaintClearsAaOn(array $grounds): void
     {
-        $tokens = $this->tokens();
-        $faint = $this->rgbOf($tokens, '--text-faint');
-
-        $grounds = [
-            // The grounds placeholder ink actually paints on — the auth page
-            // bg, the card surface, and the translucent login input, which
-            // held the old faint at 1.72/1.64/1.66. The ui binds --text-faint
-            // as the AuthField ::placeholder color (plus the OAuth-divider
-            // ink), and placeholder text is not a disabled control — it is
-            // AA-bound.
-            '--bg' => $this->rgbOf($tokens, '--bg'),
-            '--surface' => $this->rgbOf($tokens, '--surface'),
-            'input composite' => $this->inputGround($tokens),
-        ];
+        $faint = $this->rgbOf($this->tokens(), '--text-faint');
 
         foreach ($grounds as $name => $ground) {
             $ratio = $this->contrast($faint, $ground);
             $this->assertGreaterThanOrEqual(
                 self::BODY_TEXT_MIN,
                 $ratio,
-                sprintf('--text-faint on %s is %.2f:1 — below the 4.5:1 AA placeholder floor', $name, $ratio)
+                sprintf('--text-faint on %s is %.2f:1 — below the 4.5:1 AA faint-ink floor', $name, $ratio)
             );
         }
+    }
+
+    #[Test]
+    public function testTextFaintMeetsAaOnTheAuthPageAndCardGrounds(): void
+    {
+        $tokens = $this->tokens();
+
+        // LoginForm/SignupForm paint their OAuth-divider and hint ink in
+        // --text-faint on the auth page (--bg) and the auth card (--surface).
+        $this->assertFaintClearsAaOn([
+            '--bg' => $this->rgbOf($tokens, '--bg'),
+            '--surface' => $this->rgbOf($tokens, '--surface'),
+        ]);
+    }
+
+    #[Test]
+    public function testTextFaintMeetsAaAsPlaceholderInkOnTheSurface2OverlayPanels(): void
+    {
+        $tokens = $this->tokens();
+
+        // CommandPalette's search input is transparent on its --surface-2
+        // panel, and SyncPlayModal's input is --surface at 0.8 over the Modal
+        // panel's --surface-2; both bind --text-faint as ::placeholder ink.
+        // The old #857b76 measured 4.28:1 on --surface-2 — this pin was red.
+        $this->assertFaintClearsAaOn([
+            '--surface-2' => $this->rgbOf($tokens, '--surface-2'),
+            'modal input composite' => $this->modalInputGround($tokens),
+        ]);
     }
 }

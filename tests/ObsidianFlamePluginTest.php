@@ -33,6 +33,7 @@ final class ObsidianFlamePluginTest extends TestCase
         '--color-bg' => '--bg',
         '--color-surface' => '--surface',
         '--color-text' => '--text',
+        '--color-text-secondary' => '--text-muted',
         '--color-text-muted' => '--text-muted',
         '--color-border' => '--border',
     ];
@@ -244,17 +245,21 @@ final class ObsidianFlamePluginTest extends TestCase
     }
 
     #[Test]
-    public function testTheShippedAliasSetIsExactlyTheRatifiedFive(): void
+    public function testTheShippedAliasSetIsExactlyTheRatifiedSix(): void
     {
         $aliases = array_values(array_filter(
             array_keys($this->tokensOfFirstPayload()),
             static fn (string $token): bool => str_starts_with($token, '--color-')
         ));
 
-        // The 13 zero-consumer aliases stay omitted on purpose — the reviewed
+        // The 12 zero-consumer aliases stay omitted on purpose — the reviewed
         // family canon (sample DEAD_ALIASES) forbids re-inflating the payload,
-        // and W-min139 -07 was DISPROVED on exactly that canon. A sixth
-        // --color-* key is only legitimate together with a measured consumer.
+        // and W-min139 -07 was DISPROVED on exactly that canon. A further
+        // --color-* key is only legitimate together with a measured consumer:
+        // --color-text-secondary became the sixth on exactly that licence —
+        // the ui reads it fallback-less (SyncPlayPage, ParentalControlsPage,
+        // UpdateAvailableBanner), and left unset it inherited midnight's
+        // #a99d8c instead of this theme's --text-muted.
         $this->assertSame(array_keys(self::LEGACY_ALIAS_PAIRS), $aliases);
     }
 }

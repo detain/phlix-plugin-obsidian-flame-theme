@@ -31,7 +31,9 @@ Obsidian Flame extends the built-in `midnight` theme, layering a rich obsidian p
 - **Text Primary**: `#f0ebe4` — warm off-white
 - **Text Muted**: `#a69e96`
 - **Text Subtle**: `#978d86` — ≥4.5:1 AA on every ground
-- **Text Faint**: `#857b76` — placeholder ink, ≥4.5:1 AA on the auth grounds
+- **Text Faint**: `#8b817c` — placeholder and hint ink, ≥4.5:1 AA on every
+  ground it paints (`--bg`, `--surface`, and the `--surface-2` overlay panels:
+  CommandPalette, SyncPlayModal); on `--surface-3` it keeps only the ramp order
 - **Text On Accent**: `#08070a`
 
 ### Borders
@@ -126,12 +128,16 @@ The theme provides CSS custom properties (tokens) that can be referenced in your
 ```
 
 The payload also carries the live half of the legacy `--color-*` alias family
-(`--color-bg`, `--color-surface`, `--color-text`, `--color-text-muted`,
-`--color-border`), each set explicitly to the same value as the modern token it
-mirrors: theme payloads are flattened by the host, which loses CSS's `var()`
-following, so a theme that overrides one half of a pair must set both. The 13
-zero-consumer aliases (`--color-primary{,-hover,-active}`,
-`--color-surface-{hover,elevated,active}`, `--color-text-secondary`,
+(`--color-bg`, `--color-surface`, `--color-text`, `--color-text-secondary`,
+`--color-text-muted`, `--color-border`), each set explicitly to the same value
+as the modern token it mirrors (`--color-text-secondary` and
+`--color-text-muted` both mirror `--text-muted`): theme payloads are flattened
+by the host, which loses CSS's `var()` following, so a theme that overrides one
+half of a pair must set both. `--color-text-secondary` ships because the SPA
+reads it with no fallback (SyncPlayPage, ParentalControlsPage, the admin
+UpdateAvailableBanner); left unset it would inherit `midnight`'s value rather
+than this theme's muted ink. The 12 zero-consumer aliases
+(`--color-primary{,-hover,-active}`, `--color-surface-{hover,elevated,active}`,
 `--color-text-subtle`, `--color-border-subtle`, `--color-{error,success,
 warning,info}-bg`) are omitted on purpose — nothing in the shipped SPA reads
 them. If you fork this theme, keep the habit: only add an alias you can point
