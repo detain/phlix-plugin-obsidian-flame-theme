@@ -126,7 +126,7 @@ final class ObsidianFlamePluginTest extends TestCase
     #[Test]
     public function testOnEnableDoesNotThrow(): void
     {
-        $container = $this->createMock(\Psr\Container\ContainerInterface::class);
+        $container = $this->createStub(\Psr\Container\ContainerInterface::class);
 
         $this->plugin->onEnable($container);
         $this->expectNotToPerformAssertions();
